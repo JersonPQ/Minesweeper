@@ -1,14 +1,18 @@
 import javax.swing.JButton;
+// import javax.swing.JLabel;
 
 public class Box {
     
-    public JButton box;
+    public JButton boxButton;
 
-    public boolean bomb;
+    public boolean mine;
 
     public Box(){
-        bomb = false;
-        box = new JButton();
+        mine = false;
+        boxButton = new JButton();
+    }
+
+    public void addActionListener(Interface interface1) {
     }
     
 }
