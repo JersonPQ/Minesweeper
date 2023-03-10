@@ -1,5 +1,6 @@
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import java.awt.Dimension;
@@ -13,16 +14,18 @@ public class Interface{
     private JFrame window;
 
     private JPanel boardPanel;
-    // private JPanel panelsJPanel;
-
+    private JPanel inGamePanel;
+    
     private Board board;
 
     private JButton clickedButton;
 
+    private JLabel inGameLabel;
+
     public Interface(){
         window = new JFrame("Minesweeper");
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        window.setResizable(false);
+        // window.setResizable(false);
 
         addComponents();
 
@@ -33,6 +36,11 @@ public class Interface{
     private void addComponents(){
         boardPanel = new JPanel();
         boardPanel.setLayout(new GridLayout(16, 16));
+
+        inGamePanel = new JPanel();
+
+        inGameLabel = new JLabel("In Game");
+        inGamePanel.add(inGameLabel);
 
         board = new Board();
 
@@ -54,6 +62,7 @@ public class Interface{
                         clickedButton.setEnabled(false);
                         if (element.mine){
                             clickedButton.setText("BOMB");
+                            inGameLabel.setText("You Lost");
                         }
                     }
                     
@@ -61,6 +70,7 @@ public class Interface{
             }
         }
 
+        window.add(inGamePanel, BorderLayout.EAST);
         window.add(boardPanel, BorderLayout.CENTER);
     }
 }
