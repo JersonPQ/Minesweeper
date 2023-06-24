@@ -9,6 +9,7 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
 /**
@@ -24,6 +25,8 @@ public class AppMinesweeper extends javax.swing.JFrame {
     private Board board;
     private Box[][] matrixBoxs;
     
+    private int counterMines;
+    
     private int matrixSize;
     private int amountMines;
     
@@ -33,17 +36,29 @@ public class AppMinesweeper extends javax.swing.JFrame {
         
         panelMatrix.removeAll();
         panelMatrix.setLayout(new GridLayout(matrixSize, matrixSize));
-        for (Box[] arrayBoxs: matrixBoxs) {
-            for (Box box: arrayBoxs) {
+        for (int row = 0; row < matrixSize; row++) {
+            for (int column = 0; column < matrixSize; column++) {
+                Box box = matrixBoxs[row][column];
+                int[] positionBox = box.getPosition();
                 box.setPreferredSize(new Dimension(preferredSizeBox, preferredSizeBox));
                 
                 box.addActionListener(new ActionListener() {
                     
                     @Override
                     public void actionPerformed(ActionEvent e) {
+                        // conditional if there's mine
                         if (box.getMine()) {
                             box.setBackground(Color.red);
+//                            ImageIcon bombImage = new ImageIcon("src/images/bomb.png");
+//                            box.setIcon(bombImage);
                             JOptionPane.showMessageDialog(null, "Oh no! You've lost!");
+                        } else {
+                            if (box.getMinesAround() == 0)
+                                box.setText("");
+                            else
+                                box.setText("" + box.getMinesAround());
+                                
+                            box.setEnabled(false);
                         }
                     }
                 });
@@ -56,6 +71,7 @@ public class AppMinesweeper extends javax.swing.JFrame {
     public AppMinesweeper() {
         matrixSize = 16;
         amountMines = 25;
+        counterMines = 0;
         board = new Board(matrixSize, amountMines);
         
         initComponents();
@@ -72,6 +88,7 @@ public class AppMinesweeper extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        panelGeneralGame = new javax.swing.JPanel();
         panelTitle = new javax.swing.JPanel();
         labelTitle = new javax.swing.JLabel();
         panelMatrix = new javax.swing.JPanel();
@@ -79,7 +96,10 @@ public class AppMinesweeper extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setSize(new java.awt.Dimension(700, 700));
 
+        panelTitle.setForeground(new java.awt.Color(0, 0, 0));
+
         labelTitle.setFont(new java.awt.Font("Liberation Sans", 0, 24)); // NOI18N
+        labelTitle.setForeground(new java.awt.Color(0, 0, 0));
         labelTitle.setText("MINESWEEPER");
 
         javax.swing.GroupLayout panelTitleLayout = new javax.swing.GroupLayout(panelTitle);
@@ -110,25 +130,36 @@ public class AppMinesweeper extends javax.swing.JFrame {
             .addGap(0, 642, Short.MAX_VALUE)
         );
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+        javax.swing.GroupLayout panelGeneralGameLayout = new javax.swing.GroupLayout(panelGeneralGame);
+        panelGeneralGame.setLayout(panelGeneralGameLayout);
+        panelGeneralGameLayout.setHorizontalGroup(
+            panelGeneralGameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelGeneralGameLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(panelGeneralGameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(panelMatrix, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(panelTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+        panelGeneralGameLayout.setVerticalGroup(
+            panelGeneralGameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelGeneralGameLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(panelTitle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(panelMatrix, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
+        );
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(panelGeneralGame, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(panelGeneralGame, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         pack();
@@ -162,15 +193,13 @@ public class AppMinesweeper extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new AppMinesweeper().setVisible(true);
-            }
-        });
+        AppMinesweeper minesweeper = new AppMinesweeper();
+        minesweeper.setVisible(true);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel labelTitle;
+    private javax.swing.JPanel panelGeneralGame;
     private javax.swing.JPanel panelMatrix;
     private javax.swing.JPanel panelTitle;
     // End of variables declaration//GEN-END:variables

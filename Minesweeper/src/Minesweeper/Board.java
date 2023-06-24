@@ -12,7 +12,7 @@ import java.util.Random;
  */
 public class Board {
     
-    private Box[][] matrixBoxesButtons;
+    private Box[][] matrixBoxs;
         
     private Box boxClass;
 
@@ -20,33 +20,81 @@ public class Board {
 
     private Random rnd = new Random();
 
-    private int counter, row, column;
+    private int matrixSize;
+    private int counterMines, row, column;
+    private int minesAround;
 
-    public Board(int matrixSize, int amountMines){
-        matrixBoxesButtons = new Box[matrixSize][matrixSize];
-        counter = 0;
+    public Board(int matrixSizePartr, int amountMines){
+        matrixSize = matrixSizePartr;
+        matrixBoxs = new Box[matrixSize][matrixSize];
+        counterMines = 0;
 
-        for(int i = 0; i < matrixSize; i++){
-            for(int j = 0; j < matrixSize; j++){
-                // tag = Integer.toString(i) + ", " + Integer.toString(j);
+        for(int row = 0; row < matrixSize; row++){
+            for(int column = 0; column < matrixSize; column++){
                 // adds boxClasses in the matrix
                 boxClass = new Box();
-                matrixBoxesButtons[i][j] = boxClass;
+                boxClass.setPosition(row, column);
+                matrixBoxs[row][column] = boxClass;
             }
         }
 
-        while (counter < amountMines){
+        while (counterMines < amountMines){
             row = rnd.nextInt(matrixSize);
             column = rnd.nextInt(matrixSize);
-            if (!matrixBoxesButtons[row][column].getMine())
+            if (!matrixBoxs[row][column].getMine())
             {
-                matrixBoxesButtons[row][column].changeMine(true);
-                counter++;
+                matrixBoxs[row][column].changeMine(true);
+                counterMines++;
+            }
+        }
+        
+        // sets amount of mines around each box
+        for(int row = 0; row < matrixSize; row++){
+            for(int column = 0; column < matrixSize; column++){
+                minesAround = 0;
+                searchMines(row, column);
+                matrixBoxs[row][column].setMinesAround(minesAround);
             }
         }
     }
 
+    private void searchMines(int positionRowBox, int positionColumnBox){
+        // looks for mines around the box
+        for (int column = positionColumnBox - 1; column <= positionColumnBox + 1; column++) {
+            // above the box
+            try {
+                if (!(column < 0 || column >= matrixSize) && matrixBoxs[positionRowBox - 1][column].getMine()) {
+                    minesAround++;
+                }
+            } catch (IndexOutOfBoundsException e) {
+            }
+            
+            // under the box
+            try {
+                if (!(column < 0 || column >= matrixSize) && matrixBoxs[positionRowBox + 1][column].getMine()) {
+                    minesAround++;
+                }
+            } catch (IndexOutOfBoundsException e) {
+            }
+        }
+        
+        // right to the box
+        try {
+            if (matrixBoxs[positionRowBox][positionColumnBox + 1].getMine())
+                minesAround++;
+        } catch (IndexOutOfBoundsException e) {
+        }
+        
+        // left to the box
+        try {
+            if (matrixBoxs[positionRowBox][positionColumnBox - 1].getMine())
+                minesAround++;
+        } catch (IndexOutOfBoundsException e) {
+        }
+    }
+    
+    // getters
     public Box[][] getMatrixBoxesButtons() {
-        return matrixBoxesButtons;
+        return matrixBoxs;
     }
 }
