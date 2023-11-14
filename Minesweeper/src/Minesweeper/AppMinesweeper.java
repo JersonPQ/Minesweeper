@@ -9,6 +9,7 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
@@ -30,6 +31,48 @@ public class AppMinesweeper extends javax.swing.JFrame {
     private int matrixSize;
     private int amountMines;
     
+    private ArrayList<int[]> neighborsList = new ArrayList<>();
+    private ArrayList<int[]> exploredNeighbors = new ArrayList<>();
+    
+    private void neighbors(int row, int column) {
+        int matrixLength = matrixBoxs.length;
+        if (row > 0 && linearSearch(row - 1, column, neighborsList) == -1 && linearSearch(row - 1, column, exploredNeighbors) == -1 &&
+                !matrixBoxs[row - 1][column].getMine() && matrixBoxs[row - 1][column].getMinesAround() == 0)
+            neighborsList.add(new int[]{row - 1, column});
+        if (row < matrixLength - 1 && linearSearch(row + 1, column, neighborsList) == -1 && linearSearch(row + 1, column, exploredNeighbors) == -1 &&
+                !matrixBoxs[row + 1][column].getMine() && matrixBoxs[row + 1][column].getMinesAround() == 0)
+            neighborsList.add(new int[]{row + 1, column});
+        if (column > 0 && linearSearch(row, column - 1, neighborsList) == -1 && linearSearch(row, column - 1, exploredNeighbors) == -1 &&
+                !matrixBoxs[row][column - 1].getMine() && matrixBoxs[row][column - 1].getMinesAround() == 0)
+            neighborsList.add(new int[]{row, column - 1});
+        if (column < matrixLength - 1 && linearSearch(row, column + 1, neighborsList) == -1 && linearSearch(row, column + 1, exploredNeighbors) == -1 &&
+                !matrixBoxs[row][column + 1].getMine() && matrixBoxs[row][column + 1].getMinesAround() == 0)
+            neighborsList.add(new int[]{row, column + 1});
+    }
+    
+    // iterates over all the neighbors that have 0 mines around
+    private void findNeighbors(int row, int column){
+        while (!neighborsList.isEmpty()) {   
+            int[] posEvaluate = neighborsList.get(0);
+            neighbors(posEvaluate[0], posEvaluate[1]);
+            exploredNeighbors.add(new int[]{posEvaluate[0], posEvaluate[1]});
+            
+            neighborsList.remove(linearSearch(posEvaluate[0], posEvaluate[1], neighborsList));
+        }
+        
+        neighborsList.clear();
+    }
+    
+    private int linearSearch(int row, int column, ArrayList<int[]> arraySearch){
+        for (int i = 0; i < arraySearch.size(); i++) {
+            int[] tmpPosEvaluate = arraySearch.get(i);
+            if (tmpPosEvaluate[0] == row && tmpPosEvaluate[1] == column)
+                return i;
+        }
+        
+        return -1;
+    }
+    
     private void setMatrix(){
         int preferredSizeBox = (40 * matrixSize) / 16;
         matrixBoxs = board.getMatrixBoxesButtons();
@@ -39,7 +82,6 @@ public class AppMinesweeper extends javax.swing.JFrame {
         for (int row = 0; row < matrixSize; row++) {
             for (int column = 0; column < matrixSize; column++) {
                 Box box = matrixBoxs[row][column];
-                int[] positionBox = box.getPosition();
                 box.setPreferredSize(new Dimension(preferredSizeBox, preferredSizeBox));
                 
                 box.addActionListener(new ActionListener() {
@@ -53,8 +95,21 @@ public class AppMinesweeper extends javax.swing.JFrame {
 //                            box.setIcon(bombImage);
                             JOptionPane.showMessageDialog(null, "Oh no! You've lost!");
                         } else {
-                            if (box.getMinesAround() == 0)
+                            if (box.getMinesAround() == 0){
                                 box.setText("");
+                                int[] posBox = box.getPosition();
+                                neighborsList.add(box.getPosition());
+                                
+                                findNeighbors(posBox[0], posBox[1]);
+                                
+                                for (int i = 0; i < exploredNeighbors.size(); i++) {
+                                    int[] posDisable = exploredNeighbors.get(i);
+                                    matrixBoxs[posDisable[0]][posDisable[1]].setEnabled(false);
+                                    matrixBoxs[posDisable[0]][posDisable[1]].setText("");
+                                }
+                                
+                                exploredNeighbors.clear();
+                            }
                             else
                                 box.setText("" + box.getMinesAround());
                                 
@@ -70,7 +125,7 @@ public class AppMinesweeper extends javax.swing.JFrame {
     
     public AppMinesweeper() {
         matrixSize = 16;
-        amountMines = 25;
+        amountMines = 35;
         counterMines = 0;
         board = new Board(matrixSize, amountMines);
         
