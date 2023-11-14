@@ -7,6 +7,7 @@ package Minesweeper;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -23,44 +24,100 @@ public class AppMinesweeper extends javax.swing.JFrame {
      * Creates new form AppMinesweeper
      */
     
+    private boolean gameOver;
+
     private Board board;
     private Box[][] matrixBoxs;
-    
-    private int counterMines;
     
     private int matrixSize;
     private int amountMines;
     
     private ArrayList<int[]> neighborsList = new ArrayList<>();
     private ArrayList<int[]> exploredNeighbors = new ArrayList<>();
+    private ArrayList<int[]> unlockableBoxs = new ArrayList<>();
     
-    private void neighbors(int row, int column) {
+    private void neighborsNoMinesAround(int row, int column) {
         int matrixLength = matrixBoxs.length;
-        if (row > 0 && linearSearch(row - 1, column, neighborsList) == -1 && linearSearch(row - 1, column, exploredNeighbors) == -1 &&
-                !matrixBoxs[row - 1][column].getMine() && matrixBoxs[row - 1][column].getMinesAround() == 0)
-            neighborsList.add(new int[]{row - 1, column});
-        if (row < matrixLength - 1 && linearSearch(row + 1, column, neighborsList) == -1 && linearSearch(row + 1, column, exploredNeighbors) == -1 &&
-                !matrixBoxs[row + 1][column].getMine() && matrixBoxs[row + 1][column].getMinesAround() == 0)
-            neighborsList.add(new int[]{row + 1, column});
-        if (column > 0 && linearSearch(row, column - 1, neighborsList) == -1 && linearSearch(row, column - 1, exploredNeighbors) == -1 &&
-                !matrixBoxs[row][column - 1].getMine() && matrixBoxs[row][column - 1].getMinesAround() == 0)
-            neighborsList.add(new int[]{row, column - 1});
-        if (column < matrixLength - 1 && linearSearch(row, column + 1, neighborsList) == -1 && linearSearch(row, column + 1, exploredNeighbors) == -1 &&
-                !matrixBoxs[row][column + 1].getMine() && matrixBoxs[row][column + 1].getMinesAround() == 0)
-            neighborsList.add(new int[]{row, column + 1});
+        // checks up
+        if (row > 0 && linearSearch(row - 1, column, this.neighborsList) == -1 && linearSearch(row - 1, column, this.exploredNeighbors) == -1 &&
+                !this.matrixBoxs[row - 1][column].getMine() && this.matrixBoxs[row - 1][column].getMinesAround() == 0)
+            this.neighborsList.add(new int[]{row - 1, column});
+        // checks down
+        if (row < matrixLength - 1 && linearSearch(row + 1, column, this.neighborsList) == -1 && linearSearch(row + 1, column, this.exploredNeighbors) == -1 &&
+                !this.matrixBoxs[row + 1][column].getMine() && this.matrixBoxs[row + 1][column].getMinesAround() == 0)
+            this.neighborsList.add(new int[]{row + 1, column});
+        // checks left
+        if (column > 0 && linearSearch(row, column - 1, this.neighborsList) == -1 && linearSearch(row, column - 1, this.exploredNeighbors) == -1 &&
+                !this.matrixBoxs[row][column - 1].getMine() && this.matrixBoxs[row][column - 1].getMinesAround() == 0)
+            this.neighborsList.add(new int[]{row, column - 1});
+        // checks right
+        if (column < matrixLength - 1 && linearSearch(row, column + 1, this.neighborsList) == -1 && linearSearch(row, column + 1, this.exploredNeighbors) == -1 &&
+                !this.matrixBoxs[row][column + 1].getMine() && this.matrixBoxs[row][column + 1].getMinesAround() == 0)
+            this.neighborsList.add(new int[]{row, column + 1});
+    }
+    
+    private void neighborsMinesAround(int row, int column){
+        int matrixLength = matrixBoxs.length;
+        // checks up
+        if (row > 0 && linearSearch(row - 1, column, this.unlockableBoxs) == -1 && linearSearch(row - 1, column, this.exploredNeighbors) == -1 &&
+                !this.matrixBoxs[row - 1][column].getMine())
+            this.unlockableBoxs.add(new int[]{row - 1, column});
+        // checks down
+        if (row < matrixLength - 1 && linearSearch(row + 1, column, this.unlockableBoxs) == -1 && linearSearch(row + 1, column, this.exploredNeighbors) == -1 &&
+                !this.matrixBoxs[row + 1][column].getMine())
+            this.unlockableBoxs.add(new int[]{row + 1, column});
+        // checks left
+        if (column > 0 && linearSearch(row, column - 1, this.unlockableBoxs) == -1 && linearSearch(row, column - 1, this.exploredNeighbors) == -1 &&
+                !this.matrixBoxs[row][column - 1].getMine())
+            this.unlockableBoxs.add(new int[]{row, column - 1});
+        // checks right
+        if (column < matrixLength - 1 && linearSearch(row, column + 1, this.unlockableBoxs) == -1 && linearSearch(row, column + 1, this.exploredNeighbors) == -1 &&
+                !this.matrixBoxs[row][column + 1].getMine())
+            this.unlockableBoxs.add(new int[]{row, column + 1});
+        // checks diagonal up-left
+        if (row > 0 && column > 0 && linearSearch(row - 1, column - 1, this.unlockableBoxs) == -1 && linearSearch(row - 1, column - 1, this.exploredNeighbors) == -1 &&
+                !this.matrixBoxs[row - 1][column - 1].getMine())
+            this.unlockableBoxs.add(new int[]{row - 1, column - 1});
+        // checks diagonal down-right
+        if (row < matrixLength - 1 && column < matrixLength - 1 && linearSearch(row + 1, column + 1, this.unlockableBoxs) == -1 && linearSearch(row + 1, column + 1, this.exploredNeighbors) == -1 &&
+                !this.matrixBoxs[row + 1][column + 1].getMine())
+            this.unlockableBoxs.add(new int[]{row + 1, column + 1});
+        // checks diagonal down-left
+        if (row < matrixLength - 1 && column > 0 && linearSearch(row + 1, column - 1, this.unlockableBoxs) == -1 && linearSearch(row + 1, column - 1, this.exploredNeighbors) == -1 &&
+                !this.matrixBoxs[row + 1][column - 1].getMine())
+            this.unlockableBoxs.add(new int[]{row + 1, column - 1});
+        // checks diagonal up-right
+        if (row > 0 && column < matrixLength - 1 && linearSearch(row - 1, column + 1, this.unlockableBoxs) == -1 && linearSearch(row - 1, column + 1, this.exploredNeighbors) == -1 &&
+                !this.matrixBoxs[row - 1][column + 1].getMine())
+            this.unlockableBoxs.add(new int[]{row - 1, column + 1});
     }
     
     // iterates over all the neighbors that have 0 mines around
     private void findNeighbors(int row, int column){
-        while (!neighborsList.isEmpty()) {   
+        // start finding neighbors to unlock the boxes that don't have mines around
+        while (!this.neighborsList.isEmpty()) {   
             int[] posEvaluate = neighborsList.get(0);
-            neighbors(posEvaluate[0], posEvaluate[1]);
-            exploredNeighbors.add(new int[]{posEvaluate[0], posEvaluate[1]});
+            neighborsNoMinesAround(posEvaluate[0], posEvaluate[1]);
             
-            neighborsList.remove(linearSearch(posEvaluate[0], posEvaluate[1], neighborsList));
+            this.exploredNeighbors.add(new int[]{posEvaluate[0], posEvaluate[1]});
+            this.unlockableBoxs.add(new int[]{posEvaluate[0], posEvaluate[1]});
+            
+            this.neighborsList.remove(linearSearch(posEvaluate[0], posEvaluate[1], neighborsList));
         }
         
-        neighborsList.clear();
+        this.neighborsList.clear();
+        this.exploredNeighbors.clear();
+        
+        this.neighborsList = (ArrayList<int[]>) unlockableBoxs.clone();
+        
+        // starts iterating to unlock the boxes that have mines around
+        for (int[] pos : neighborsList) {
+            neighborsMinesAround(pos[0], pos[1]);
+            exploredNeighbors.add(new int[]{pos[0], pos[1]});
+        }
+        
+        this.neighborsList.clear();
+        this.exploredNeighbors.clear();
     }
     
     private int linearSearch(int row, int column, ArrayList<int[]> arraySearch){
@@ -75,10 +132,10 @@ public class AppMinesweeper extends javax.swing.JFrame {
     
     private void setMatrix(){
         int preferredSizeBox = (40 * matrixSize) / 16;
-        matrixBoxs = board.getMatrixBoxesButtons();
+        this.matrixBoxs = board.getMatrixBoxesButtons();
         
-        panelMatrix.removeAll();
-        panelMatrix.setLayout(new GridLayout(matrixSize, matrixSize));
+        this.panelMatrix.removeAll();
+        this.panelMatrix.setLayout(new GridLayout(matrixSize, matrixSize));
         for (int row = 0; row < matrixSize; row++) {
             for (int column = 0; column < matrixSize; column++) {
                 Box box = matrixBoxs[row][column];
@@ -89,47 +146,78 @@ public class AppMinesweeper extends javax.swing.JFrame {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         // conditional if there's mine
-                        if (box.getMine()) {
-                            box.setBackground(Color.red);
-//                            ImageIcon bombImage = new ImageIcon("src/images/bomb.png");
-//                            box.setIcon(bombImage);
-                            JOptionPane.showMessageDialog(null, "Oh no! You've lost!");
-                        } else {
-                            if (box.getMinesAround() == 0){
-                                box.setText("");
-                                int[] posBox = box.getPosition();
-                                neighborsList.add(box.getPosition());
+                        if (!gameOver) {
+                            if (box.getMine()) {
+                                box.setBackground(new Color(224, 109, 98, 88));
+                                gameOver = true;
+                                ImageIcon bombImage = new ImageIcon("src/images/bomb.png");
                                 
-                                findNeighbors(posBox[0], posBox[1]);
+                                // resize image
+                                Image image = bombImage.getImage();
+                                Image newImage = image.getScaledInstance(14, 14, Image.SCALE_SMOOTH);
+                                bombImage = new ImageIcon(newImage);
                                 
-                                for (int i = 0; i < exploredNeighbors.size(); i++) {
-                                    int[] posDisable = exploredNeighbors.get(i);
-                                    matrixBoxs[posDisable[0]][posDisable[1]].setEnabled(false);
-                                    matrixBoxs[posDisable[0]][posDisable[1]].setText("");
+                                // set image on button
+                                box.setIcon(bombImage);
+                                JOptionPane.showMessageDialog(null, "Oh no! You've lost!");
+                            } else {
+                                if (box.getMinesAround() == 0){
+                                    box.setText("");
+                                    int[] posBox = box.getPosition();
+                                    neighborsList.add(box.getPosition());
+                                    
+                                    findNeighbors(posBox[0], posBox[1]);
+                                    
+                                    for (int i = 0; i < unlockableBoxs.size(); i++) {
+                                        int[] posDisable = unlockableBoxs.get(i);
+                                        matrixBoxs[posDisable[0]][posDisable[1]].setEnabled(false);
+                                        int minesAround = matrixBoxs[posDisable[0]][posDisable[1]].getMinesAround();
+                                        if (minesAround == 0) {
+                                            matrixBoxs[posDisable[0]][posDisable[1]].setText("");
+                                        } else {
+                                            matrixBoxs[posDisable[0]][posDisable[1]].setText("" + minesAround);
+                                        }
+                                    }
+                                    
+                                    unlockableBoxs.clear();
                                 }
-                                
-                                exploredNeighbors.clear();
+                                else
+                                    box.setText("" + box.getMinesAround());
+                                    
+                                box.setEnabled(false);
                             }
-                            else
-                                box.setText("" + box.getMinesAround());
-                                
-                            box.setEnabled(false);
                         }
                     }
                 });
                 
-                panelMatrix.add(box);
+                this.panelMatrix.add(box);
             }
         }
     }
     
+    private void resetMarix() {
+        this.gameOver = false;
+        this.board = new Board(matrixSize, amountMines);
+        this.panelMatrix.removeAll();
+        this.panelMatrix.revalidate();
+        this.panelMatrix.repaint();
+        setMatrix();
+    }
+    
     public AppMinesweeper() {
-        matrixSize = 16;
-        amountMines = 35;
-        counterMines = 0;
-        board = new Board(matrixSize, amountMines);
+        this.gameOver = false;
+        this.matrixSize = 16;
+        this.amountMines = 50;
+        this.board = new Board(matrixSize, amountMines);
         
         initComponents();
+
+        this.panelGeneralGame.setBackground(Color.white);
+        this.panelTitle.setBackground(Color.white);
+        this.panelMatrix.setBackground(Color.white);
+        this.resetPanel.setBackground(Color.white);
+
+        this.resetButton.setBackground(Color.white);
         
         setMatrix();
     }
@@ -147,6 +235,8 @@ public class AppMinesweeper extends javax.swing.JFrame {
         panelTitle = new javax.swing.JPanel();
         labelTitle = new javax.swing.JLabel();
         panelMatrix = new javax.swing.JPanel();
+        resetPanel = new javax.swing.JPanel();
+        resetButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setSize(new java.awt.Dimension(700, 700));
@@ -178,22 +268,44 @@ public class AppMinesweeper extends javax.swing.JFrame {
         panelMatrix.setLayout(panelMatrixLayout);
         panelMatrixLayout.setHorizontalGroup(
             panelMatrixLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGap(0, 688, Short.MAX_VALUE)
         );
         panelMatrixLayout.setVerticalGroup(
             panelMatrixLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 642, Short.MAX_VALUE)
+            .addGap(0, 638, Short.MAX_VALUE)
+        );
+
+        resetButton.setText("Reset");
+        resetButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                resetButtonActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout resetPanelLayout = new javax.swing.GroupLayout(resetPanel);
+        resetPanel.setLayout(resetPanelLayout);
+        resetPanelLayout.setHorizontalGroup(
+            resetPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(resetPanelLayout.createSequentialGroup()
+                .addGap(296, 296, 296)
+                .addComponent(resetButton)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        resetPanelLayout.setVerticalGroup(
+            resetPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(resetButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         javax.swing.GroupLayout panelGeneralGameLayout = new javax.swing.GroupLayout(panelGeneralGame);
         panelGeneralGame.setLayout(panelGeneralGameLayout);
         panelGeneralGameLayout.setHorizontalGroup(
             panelGeneralGameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelGeneralGameLayout.createSequentialGroup()
+            .addGroup(panelGeneralGameLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(panelGeneralGameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(panelMatrix, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(panelTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(panelGeneralGameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(panelMatrix, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(panelTitle, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(resetPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         panelGeneralGameLayout.setVerticalGroup(
@@ -203,6 +315,8 @@ public class AppMinesweeper extends javax.swing.JFrame {
                 .addComponent(panelTitle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(panelMatrix, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(resetPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -210,15 +324,21 @@ public class AppMinesweeper extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(panelGeneralGame, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(panelGeneralGame, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(panelGeneralGame, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(panelGeneralGame, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void resetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetButtonActionPerformed
+       resetMarix();
+    }//GEN-LAST:event_resetButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -257,5 +377,7 @@ public class AppMinesweeper extends javax.swing.JFrame {
     private javax.swing.JPanel panelGeneralGame;
     private javax.swing.JPanel panelMatrix;
     private javax.swing.JPanel panelTitle;
+    private javax.swing.JButton resetButton;
+    private javax.swing.JPanel resetPanel;
     // End of variables declaration//GEN-END:variables
 }

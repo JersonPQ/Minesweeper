@@ -4,7 +4,11 @@
  */
 package Minesweeper;
 
+import java.awt.Color;
+
 import javax.swing.JButton;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.LineBorder;
 
 /**
  *
@@ -22,6 +26,9 @@ public class Box extends JButton{
         this.minesAround = 0;
         
         this.position = new int[2];
+
+        this.setBackground(Color.white);
+        this.setBorderPainted(false);
     }
     
     public void changeMine(boolean value) {
