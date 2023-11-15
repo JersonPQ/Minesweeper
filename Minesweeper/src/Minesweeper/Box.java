@@ -7,8 +7,6 @@ package Minesweeper;
 import java.awt.Color;
 
 import javax.swing.JButton;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.LineBorder;
 
 /**
  *
@@ -17,15 +15,19 @@ import javax.swing.border.LineBorder;
 public class Box extends JButton{
 
     private boolean mine;
+    private boolean flag;
     private int minesAround;
     
     private int[] position;
 
     public Box(){
         this.mine = false;
+        this.flag = false;
         this.minesAround = 0;
         
         this.position = new int[2];
+
+        this.setFocusable(false);
 
         this.setBackground(Color.white);
         this.setBorderPainted(false);
@@ -47,6 +49,10 @@ public class Box extends JButton{
     public int[] getPosition(){
         return position;
     }
+
+    public boolean getFlag(){
+        return flag;
+    }
     
     // setters
     public void setMinesAround(int mines) {
@@ -56,5 +62,9 @@ public class Box extends JButton{
     public void setPosition(int row, int column) {
         this.position[0] = row;
         this.position[1] = column;
+    }
+
+    public void setFlag(boolean boolFlag){
+        this.flag = boolFlag;
     }
 }

@@ -10,9 +10,12 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -40,19 +43,19 @@ public class AppMinesweeper extends javax.swing.JFrame {
         int matrixLength = matrixBoxs.length;
         // checks up
         if (row > 0 && linearSearch(row - 1, column, this.neighborsList) == -1 && linearSearch(row - 1, column, this.exploredNeighbors) == -1 &&
-                !this.matrixBoxs[row - 1][column].getMine() && this.matrixBoxs[row - 1][column].getMinesAround() == 0)
+                !this.matrixBoxs[row - 1][column].getMine() && this.matrixBoxs[row - 1][column].getMinesAround() == 0 && !this.matrixBoxs[row - 1][column].getFlag())
             this.neighborsList.add(new int[]{row - 1, column});
         // checks down
         if (row < matrixLength - 1 && linearSearch(row + 1, column, this.neighborsList) == -1 && linearSearch(row + 1, column, this.exploredNeighbors) == -1 &&
-                !this.matrixBoxs[row + 1][column].getMine() && this.matrixBoxs[row + 1][column].getMinesAround() == 0)
+                !this.matrixBoxs[row + 1][column].getMine() && this.matrixBoxs[row + 1][column].getMinesAround() == 0 && !this.matrixBoxs[row + 1][column].getFlag())
             this.neighborsList.add(new int[]{row + 1, column});
         // checks left
         if (column > 0 && linearSearch(row, column - 1, this.neighborsList) == -1 && linearSearch(row, column - 1, this.exploredNeighbors) == -1 &&
-                !this.matrixBoxs[row][column - 1].getMine() && this.matrixBoxs[row][column - 1].getMinesAround() == 0)
+                !this.matrixBoxs[row][column - 1].getMine() && this.matrixBoxs[row][column - 1].getMinesAround() == 0 && !this.matrixBoxs[row][column - 1].getFlag())
             this.neighborsList.add(new int[]{row, column - 1});
         // checks right
         if (column < matrixLength - 1 && linearSearch(row, column + 1, this.neighborsList) == -1 && linearSearch(row, column + 1, this.exploredNeighbors) == -1 &&
-                !this.matrixBoxs[row][column + 1].getMine() && this.matrixBoxs[row][column + 1].getMinesAround() == 0)
+                !this.matrixBoxs[row][column + 1].getMine() && this.matrixBoxs[row][column + 1].getMinesAround() == 0 && !this.matrixBoxs[row][column + 1].getFlag())
             this.neighborsList.add(new int[]{row, column + 1});
     }
     
@@ -60,35 +63,35 @@ public class AppMinesweeper extends javax.swing.JFrame {
         int matrixLength = matrixBoxs.length;
         // checks up
         if (row > 0 && linearSearch(row - 1, column, this.unlockableBoxs) == -1 && linearSearch(row - 1, column, this.exploredNeighbors) == -1 &&
-                !this.matrixBoxs[row - 1][column].getMine())
+                !this.matrixBoxs[row - 1][column].getMine() && !this.matrixBoxs[row - 1][column].getFlag())
             this.unlockableBoxs.add(new int[]{row - 1, column});
         // checks down
         if (row < matrixLength - 1 && linearSearch(row + 1, column, this.unlockableBoxs) == -1 && linearSearch(row + 1, column, this.exploredNeighbors) == -1 &&
-                !this.matrixBoxs[row + 1][column].getMine())
+                !this.matrixBoxs[row + 1][column].getMine() && !this.matrixBoxs[row + 1][column].getFlag())
             this.unlockableBoxs.add(new int[]{row + 1, column});
         // checks left
         if (column > 0 && linearSearch(row, column - 1, this.unlockableBoxs) == -1 && linearSearch(row, column - 1, this.exploredNeighbors) == -1 &&
-                !this.matrixBoxs[row][column - 1].getMine())
+                !this.matrixBoxs[row][column - 1].getMine() && !this.matrixBoxs[row][column - 1].getFlag())
             this.unlockableBoxs.add(new int[]{row, column - 1});
         // checks right
         if (column < matrixLength - 1 && linearSearch(row, column + 1, this.unlockableBoxs) == -1 && linearSearch(row, column + 1, this.exploredNeighbors) == -1 &&
-                !this.matrixBoxs[row][column + 1].getMine())
+                !this.matrixBoxs[row][column + 1].getMine() && !this.matrixBoxs[row][column + 1].getFlag())
             this.unlockableBoxs.add(new int[]{row, column + 1});
         // checks diagonal up-left
         if (row > 0 && column > 0 && linearSearch(row - 1, column - 1, this.unlockableBoxs) == -1 && linearSearch(row - 1, column - 1, this.exploredNeighbors) == -1 &&
-                !this.matrixBoxs[row - 1][column - 1].getMine())
+                !this.matrixBoxs[row - 1][column - 1].getMine() && !this.matrixBoxs[row - 1][column - 1].getFlag())
             this.unlockableBoxs.add(new int[]{row - 1, column - 1});
         // checks diagonal down-right
         if (row < matrixLength - 1 && column < matrixLength - 1 && linearSearch(row + 1, column + 1, this.unlockableBoxs) == -1 && linearSearch(row + 1, column + 1, this.exploredNeighbors) == -1 &&
-                !this.matrixBoxs[row + 1][column + 1].getMine())
+                !this.matrixBoxs[row + 1][column + 1].getMine() && !this.matrixBoxs[row + 1][column + 1].getFlag())
             this.unlockableBoxs.add(new int[]{row + 1, column + 1});
         // checks diagonal down-left
         if (row < matrixLength - 1 && column > 0 && linearSearch(row + 1, column - 1, this.unlockableBoxs) == -1 && linearSearch(row + 1, column - 1, this.exploredNeighbors) == -1 &&
-                !this.matrixBoxs[row + 1][column - 1].getMine())
+                !this.matrixBoxs[row + 1][column - 1].getMine() && !this.matrixBoxs[row + 1][column - 1].getFlag())
             this.unlockableBoxs.add(new int[]{row + 1, column - 1});
         // checks diagonal up-right
         if (row > 0 && column < matrixLength - 1 && linearSearch(row - 1, column + 1, this.unlockableBoxs) == -1 && linearSearch(row - 1, column + 1, this.exploredNeighbors) == -1 &&
-                !this.matrixBoxs[row - 1][column + 1].getMine())
+                !this.matrixBoxs[row - 1][column + 1].getMine() && !this.matrixBoxs[row - 1][column + 1].getFlag())
             this.unlockableBoxs.add(new int[]{row - 1, column + 1});
     }
     
@@ -141,52 +144,100 @@ public class AppMinesweeper extends javax.swing.JFrame {
                 Box box = matrixBoxs[row][column];
                 box.setPreferredSize(new Dimension(preferredSizeBox, preferredSizeBox));
                 
+                box.addMouseListener(new MouseListener() {
+                    
+                    public void mouseClicked(MouseEvent e){
+                        if (!gameOver) {
+                            if (SwingUtilities.isRightMouseButton(e) && e.getClickCount() == 1 && box.isEnabled()) {
+                                if (!box.getFlag()) {
+                                    box.setFlag(true);
+                                    ImageIcon flagImage = new ImageIcon("src/images/red-flag.png");
+
+                                    // resize image
+                                    Image image = flagImage.getImage();
+                                    Image newImage = image.getScaledInstance(14, 14, Image.SCALE_SMOOTH);
+                                    flagImage = new ImageIcon(newImage);
+
+                                    // set image on button
+                                    box.setIcon(flagImage);
+                                } else {
+                                    box.setFlag(false);
+                                    box.setIcon(null);
+                                }
+                            }
+
+                            if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 1 && !box.getFlag()) {
+                                
+                                // conditional if there's mine
+                                if (box.getMine()) {
+                                    box.setBackground(new Color(224, 109, 98, 88));
+                                    gameOver = true;
+                                    ImageIcon bombImage = new ImageIcon("src/images/bomb.png");
+                                    
+                                    // resize image
+                                    Image image = bombImage.getImage();
+                                    Image newImage = image.getScaledInstance(14, 14, Image.SCALE_SMOOTH);
+                                    bombImage = new ImageIcon(newImage);
+                                    
+                                    // set image on button
+                                    box.setIcon(bombImage);
+                                    JOptionPane.showMessageDialog(null, "Oh no! You've lost!");
+                                } else {
+                                    if (box.getMinesAround() == 0){
+                                        box.setText("");
+                                        int[] posBox = box.getPosition();
+                                        neighborsList.add(box.getPosition());
+                                        
+                                        findNeighbors(posBox[0], posBox[1]);
+                                        
+                                        for (int i = 0; i < unlockableBoxs.size(); i++) {
+                                            int[] posDisable = unlockableBoxs.get(i);
+                                            matrixBoxs[posDisable[0]][posDisable[1]].setEnabled(false);
+                                            int minesAround = matrixBoxs[posDisable[0]][posDisable[1]].getMinesAround();
+                                            if (minesAround == 0) {
+                                                matrixBoxs[posDisable[0]][posDisable[1]].setText("");
+                                            } else {
+                                                matrixBoxs[posDisable[0]][posDisable[1]].setText("" + minesAround);
+                                            }
+                                        }
+                                        
+                                        unlockableBoxs.clear();
+                                    }
+                                    else
+                                        box.setText("" + box.getMinesAround());
+                                        
+                                    box.setEnabled(false);
+                                }
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        
+                    }
+
+                    @Override
+                    public void mouseReleased(MouseEvent e) {
+                        
+                    }
+
+                    @Override
+                    public void mouseEntered(MouseEvent e) {
+                        
+                    }
+
+                    @Override
+                    public void mouseExited(MouseEvent e) {
+                        
+                    }
+                });
+
                 box.addActionListener(new ActionListener() {
                     
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        // conditional if there's mine
-                        if (!gameOver) {
-                            if (box.getMine()) {
-                                box.setBackground(new Color(224, 109, 98, 88));
-                                gameOver = true;
-                                ImageIcon bombImage = new ImageIcon("src/images/bomb.png");
-                                
-                                // resize image
-                                Image image = bombImage.getImage();
-                                Image newImage = image.getScaledInstance(14, 14, Image.SCALE_SMOOTH);
-                                bombImage = new ImageIcon(newImage);
-                                
-                                // set image on button
-                                box.setIcon(bombImage);
-                                JOptionPane.showMessageDialog(null, "Oh no! You've lost!");
-                            } else {
-                                if (box.getMinesAround() == 0){
-                                    box.setText("");
-                                    int[] posBox = box.getPosition();
-                                    neighborsList.add(box.getPosition());
-                                    
-                                    findNeighbors(posBox[0], posBox[1]);
-                                    
-                                    for (int i = 0; i < unlockableBoxs.size(); i++) {
-                                        int[] posDisable = unlockableBoxs.get(i);
-                                        matrixBoxs[posDisable[0]][posDisable[1]].setEnabled(false);
-                                        int minesAround = matrixBoxs[posDisable[0]][posDisable[1]].getMinesAround();
-                                        if (minesAround == 0) {
-                                            matrixBoxs[posDisable[0]][posDisable[1]].setText("");
-                                        } else {
-                                            matrixBoxs[posDisable[0]][posDisable[1]].setText("" + minesAround);
-                                        }
-                                    }
-                                    
-                                    unlockableBoxs.clear();
-                                }
-                                else
-                                    box.setText("" + box.getMinesAround());
-                                    
-                                box.setEnabled(false);
-                            }
-                        }
+                        
                     }
                 });
                 
@@ -212,11 +263,16 @@ public class AppMinesweeper extends javax.swing.JFrame {
         
         initComponents();
 
+        this.setResizable(false);
+
+        this.setTitle("Minesweeper - Jerson Prendas Quirós");
+
         this.panelGeneralGame.setBackground(Color.white);
         this.panelTitle.setBackground(Color.white);
         this.panelMatrix.setBackground(Color.white);
         this.resetPanel.setBackground(Color.white);
 
+        this.resetButton.setFocusable(false);
         this.resetButton.setBackground(Color.white);
         
         setMatrix();
@@ -243,7 +299,7 @@ public class AppMinesweeper extends javax.swing.JFrame {
 
         panelTitle.setForeground(new java.awt.Color(0, 0, 0));
 
-        labelTitle.setFont(new java.awt.Font("Liberation Sans", 0, 24)); // NOI18N
+        labelTitle.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         labelTitle.setForeground(new java.awt.Color(0, 0, 0));
         labelTitle.setText("MINESWEEPER");
 
@@ -272,7 +328,7 @@ public class AppMinesweeper extends javax.swing.JFrame {
         );
         panelMatrixLayout.setVerticalGroup(
             panelMatrixLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 638, Short.MAX_VALUE)
+            .addGap(0, 626, Short.MAX_VALUE)
         );
 
         resetButton.setText("Reset");
@@ -287,13 +343,15 @@ public class AppMinesweeper extends javax.swing.JFrame {
         resetPanelLayout.setHorizontalGroup(
             resetPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(resetPanelLayout.createSequentialGroup()
-                .addGap(296, 296, 296)
+                .addGap(306, 306, 306)
                 .addComponent(resetButton)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         resetPanelLayout.setVerticalGroup(
             resetPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(resetButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, resetPanelLayout.createSequentialGroup()
+                .addGap(0, 12, Short.MAX_VALUE)
+                .addComponent(resetButton, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         javax.swing.GroupLayout panelGeneralGameLayout = new javax.swing.GroupLayout(panelGeneralGame);
