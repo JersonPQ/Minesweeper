@@ -8,8 +8,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
@@ -34,28 +32,47 @@ public class AppMinesweeper extends javax.swing.JFrame {
     
     private int matrixSize;
     private int amountMines;
+
+    private int sumTotalValues;
+    private int sumCurrentValues;
     
     private ArrayList<int[]> neighborsList = new ArrayList<>();
     private ArrayList<int[]> exploredNeighbors = new ArrayList<>();
     private ArrayList<int[]> unlockableBoxs = new ArrayList<>();
     
+    private boolean hasMine(int row, int column){
+        return this.matrixBoxs[row][column].getMine();
+    }
+
+    private boolean hasNoMinesAround(int row, int column){
+        return this.matrixBoxs[row][column].getMinesAround() == 0;
+    }
+
+    private boolean hasFlag(int row, int column){
+        return this.matrixBoxs[row][column].getFlag();
+    }
+
+    private boolean isButtonEnabled(int row, int column){
+        return this.matrixBoxs[row][column].isEnabled();
+    }
+
     private void neighborsNoMinesAround(int row, int column) {
         int matrixLength = matrixBoxs.length;
         // checks up
         if (row > 0 && linearSearch(row - 1, column, this.neighborsList) == -1 && linearSearch(row - 1, column, this.exploredNeighbors) == -1 &&
-                !this.matrixBoxs[row - 1][column].getMine() && this.matrixBoxs[row - 1][column].getMinesAround() == 0 && !this.matrixBoxs[row - 1][column].getFlag())
+                !hasMine(row - 1, column) && hasNoMinesAround(row - 1, column) && !hasFlag(row - 1, column) && isButtonEnabled(row - 1, column))
             this.neighborsList.add(new int[]{row - 1, column});
         // checks down
         if (row < matrixLength - 1 && linearSearch(row + 1, column, this.neighborsList) == -1 && linearSearch(row + 1, column, this.exploredNeighbors) == -1 &&
-                !this.matrixBoxs[row + 1][column].getMine() && this.matrixBoxs[row + 1][column].getMinesAround() == 0 && !this.matrixBoxs[row + 1][column].getFlag())
+                !hasMine(row + 1, column) && hasNoMinesAround(row + 1, column) && !hasFlag(row + 1, column) && isButtonEnabled(row + 1, column))
             this.neighborsList.add(new int[]{row + 1, column});
         // checks left
         if (column > 0 && linearSearch(row, column - 1, this.neighborsList) == -1 && linearSearch(row, column - 1, this.exploredNeighbors) == -1 &&
-                !this.matrixBoxs[row][column - 1].getMine() && this.matrixBoxs[row][column - 1].getMinesAround() == 0 && !this.matrixBoxs[row][column - 1].getFlag())
+                !hasMine(row, column - 1) && hasNoMinesAround(row, column - 1) && !hasFlag(row, column - 1) && isButtonEnabled(row, column - 1))
             this.neighborsList.add(new int[]{row, column - 1});
         // checks right
         if (column < matrixLength - 1 && linearSearch(row, column + 1, this.neighborsList) == -1 && linearSearch(row, column + 1, this.exploredNeighbors) == -1 &&
-                !this.matrixBoxs[row][column + 1].getMine() && this.matrixBoxs[row][column + 1].getMinesAround() == 0 && !this.matrixBoxs[row][column + 1].getFlag())
+                !hasMine(row, column + 1) && hasNoMinesAround(row, column + 1) && !hasFlag(row, column + 1) && isButtonEnabled(row, column + 1))
             this.neighborsList.add(new int[]{row, column + 1});
     }
     
@@ -63,35 +80,35 @@ public class AppMinesweeper extends javax.swing.JFrame {
         int matrixLength = matrixBoxs.length;
         // checks up
         if (row > 0 && linearSearch(row - 1, column, this.unlockableBoxs) == -1 && linearSearch(row - 1, column, this.exploredNeighbors) == -1 &&
-                !this.matrixBoxs[row - 1][column].getMine() && !this.matrixBoxs[row - 1][column].getFlag())
+                !hasMine(row - 1, column) && !hasFlag(row - 1, column) && isButtonEnabled(row - 1, column))
             this.unlockableBoxs.add(new int[]{row - 1, column});
         // checks down
         if (row < matrixLength - 1 && linearSearch(row + 1, column, this.unlockableBoxs) == -1 && linearSearch(row + 1, column, this.exploredNeighbors) == -1 &&
-                !this.matrixBoxs[row + 1][column].getMine() && !this.matrixBoxs[row + 1][column].getFlag())
+                !hasMine(row + 1, column) && !hasFlag(row + 1, column) && isButtonEnabled(row + 1, column))
             this.unlockableBoxs.add(new int[]{row + 1, column});
         // checks left
         if (column > 0 && linearSearch(row, column - 1, this.unlockableBoxs) == -1 && linearSearch(row, column - 1, this.exploredNeighbors) == -1 &&
-                !this.matrixBoxs[row][column - 1].getMine() && !this.matrixBoxs[row][column - 1].getFlag())
+                !hasMine(row, column - 1) && !hasFlag(row, column - 1) && isButtonEnabled(row, column - 1))
             this.unlockableBoxs.add(new int[]{row, column - 1});
         // checks right
         if (column < matrixLength - 1 && linearSearch(row, column + 1, this.unlockableBoxs) == -1 && linearSearch(row, column + 1, this.exploredNeighbors) == -1 &&
-                !this.matrixBoxs[row][column + 1].getMine() && !this.matrixBoxs[row][column + 1].getFlag())
+                !hasMine(row, column + 1) && !hasFlag(row, column + 1) && isButtonEnabled(row, column + 1))
             this.unlockableBoxs.add(new int[]{row, column + 1});
         // checks diagonal up-left
         if (row > 0 && column > 0 && linearSearch(row - 1, column - 1, this.unlockableBoxs) == -1 && linearSearch(row - 1, column - 1, this.exploredNeighbors) == -1 &&
-                !this.matrixBoxs[row - 1][column - 1].getMine() && !this.matrixBoxs[row - 1][column - 1].getFlag())
+                !hasMine(row - 1, column - 1) && !hasFlag(row - 1, column - 1) && isButtonEnabled(row - 1, column - 1))
             this.unlockableBoxs.add(new int[]{row - 1, column - 1});
         // checks diagonal down-right
         if (row < matrixLength - 1 && column < matrixLength - 1 && linearSearch(row + 1, column + 1, this.unlockableBoxs) == -1 && linearSearch(row + 1, column + 1, this.exploredNeighbors) == -1 &&
-                !this.matrixBoxs[row + 1][column + 1].getMine() && !this.matrixBoxs[row + 1][column + 1].getFlag())
+                !hasMine(row + 1, column + 1) && !hasFlag(row + 1, column + 1) && isButtonEnabled(row + 1, column + 1))
             this.unlockableBoxs.add(new int[]{row + 1, column + 1});
         // checks diagonal down-left
         if (row < matrixLength - 1 && column > 0 && linearSearch(row + 1, column - 1, this.unlockableBoxs) == -1 && linearSearch(row + 1, column - 1, this.exploredNeighbors) == -1 &&
-                !this.matrixBoxs[row + 1][column - 1].getMine() && !this.matrixBoxs[row + 1][column - 1].getFlag())
+                !hasMine(row + 1, column - 1) && !hasFlag(row + 1, column - 1) && isButtonEnabled(row + 1, column - 1))
             this.unlockableBoxs.add(new int[]{row + 1, column - 1});
         // checks diagonal up-right
         if (row > 0 && column < matrixLength - 1 && linearSearch(row - 1, column + 1, this.unlockableBoxs) == -1 && linearSearch(row - 1, column + 1, this.exploredNeighbors) == -1 &&
-                !this.matrixBoxs[row - 1][column + 1].getMine() && !this.matrixBoxs[row - 1][column + 1].getFlag())
+                !hasMine(row - 1, column + 1) && !hasFlag(row - 1, column + 1) && isButtonEnabled(row - 1, column + 1))
             this.unlockableBoxs.add(new int[]{row - 1, column + 1});
     }
     
@@ -142,15 +159,20 @@ public class AppMinesweeper extends javax.swing.JFrame {
         for (int row = 0; row < matrixSize; row++) {
             for (int column = 0; column < matrixSize; column++) {
                 Box box = matrixBoxs[row][column];
+
+                // adds amount of mines that each box has around
+                this.sumTotalValues += box.getMinesAround();
+
                 box.setPreferredSize(new Dimension(preferredSizeBox, preferredSizeBox));
                 
                 box.addMouseListener(new MouseListener() {
                     
                     public void mouseClicked(MouseEvent e){
                         if (!gameOver) {
-                            if (SwingUtilities.isRightMouseButton(e) && e.getClickCount() == 1 && box.isEnabled()) {
+                            if (SwingUtilities.isRightMouseButton(e) && box.isEnabled()) {
                                 if (!box.getFlag()) {
                                     box.setFlag(true);
+
                                     ImageIcon flagImage = new ImageIcon("src/images/red-flag.png");
 
                                     // resize image
@@ -166,8 +188,7 @@ public class AppMinesweeper extends javax.swing.JFrame {
                                 }
                             }
 
-                            if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 1 && !box.getFlag()) {
-                                
+                            if (SwingUtilities.isLeftMouseButton(e) && !box.getFlag()) {
                                 // conditional if there's mine
                                 if (box.getMine()) {
                                     box.setBackground(new Color(224, 109, 98, 88));
@@ -181,7 +202,17 @@ public class AppMinesweeper extends javax.swing.JFrame {
                                     
                                     // set image on button
                                     box.setIcon(bombImage);
-                                    JOptionPane.showMessageDialog(null, "Oh no! You've lost!");
+                                    
+                                    for (int i = 0; i < matrixBoxs.length; i++) {
+                                        for (int j = 0; j < matrixBoxs.length; j++) {
+                                            if (matrixBoxs[i][j].getMine()){
+                                                matrixBoxs[i][j].setIcon(bombImage);
+                                            }
+                                        }
+                                    }
+
+                                    JOptionPane.showMessageDialog(null, "Oh no! You have lost!");
+
                                 } else {
                                     if (box.getMinesAround() == 0){
                                         box.setText("");
@@ -198,15 +229,22 @@ public class AppMinesweeper extends javax.swing.JFrame {
                                                 matrixBoxs[posDisable[0]][posDisable[1]].setText("");
                                             } else {
                                                 matrixBoxs[posDisable[0]][posDisable[1]].setText("" + minesAround);
+                                                sumCurrentValues += minesAround;
                                             }
                                         }
                                         
                                         unlockableBoxs.clear();
-                                    }
-                                    else
+                                    } else {
                                         box.setText("" + box.getMinesAround());
+                                        sumCurrentValues += box.getMinesAround();
+                                    }
                                         
                                     box.setEnabled(false);
+
+                                    if (sumTotalValues == sumCurrentValues) {
+                                        gameOver = true;
+                                        JOptionPane.showMessageDialog(null, "Congratulations! You have won the game!");
+                                    }
                                 }
                             }
                         }
@@ -232,14 +270,6 @@ public class AppMinesweeper extends javax.swing.JFrame {
                         
                     }
                 });
-
-                box.addActionListener(new ActionListener() {
-                    
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        
-                    }
-                });
                 
                 this.panelMatrix.add(box);
             }
@@ -249,6 +279,11 @@ public class AppMinesweeper extends javax.swing.JFrame {
     private void resetMarix() {
         this.gameOver = false;
         this.board = new Board(matrixSize, amountMines);
+
+        // reset values
+        this.sumTotalValues = 0;
+        this.sumCurrentValues = 0;
+
         this.panelMatrix.removeAll();
         this.panelMatrix.revalidate();
         this.panelMatrix.repaint();
@@ -257,8 +292,10 @@ public class AppMinesweeper extends javax.swing.JFrame {
     
     public AppMinesweeper() {
         this.gameOver = false;
+        this.sumTotalValues = 0;
+        this.sumCurrentValues = 0;
         this.matrixSize = 16;
-        this.amountMines = 50;
+        this.amountMines = 35;
         this.board = new Board(matrixSize, amountMines);
         
         initComponents();

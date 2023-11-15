@@ -52,39 +52,41 @@ public class Board {
         // sets amount of mines around each box
         for(int row = 0; row < matrixSize; row++){
             for(int column = 0; column < matrixSize; column++){
-                minesAround = 0;
-                searchMines(row, column);
-                matrixBoxs[row][column].setMinesAround(minesAround);
-                switch (minesAround) {
-                    case 1:
-                        matrixBoxs[row][column].setForeground(Color.red);
-                        break;
-                    case 2:
-                        matrixBoxs[row][column].setForeground(Color.blue);
-                        break;
-                    case 3:
-                        matrixBoxs[row][column].setForeground(Color.magenta);
-                        break;
-                    case 4:
-                        matrixBoxs[row][column].setForeground(Color.yellow);
-                        break;
-                    case 5:
-                        matrixBoxs[row][column].setForeground(Color.green);
-                        break;
-                    case 6:
-                        matrixBoxs[row][column].setForeground(Color.cyan);
-                        break;
-                    case 7:
-                        matrixBoxs[row][column].setForeground(Color.orange);
-                        break;
-                    case 8:
-                        matrixBoxs[row][column].setForeground(Color.black);
-                        break;
-                    case 9:
-                        matrixBoxs[row][column].setForeground(Color.darkGray);
-                        break;
-                    default:
-                        break;
+                if (!matrixBoxs[row][column].getMine()) {
+                    minesAround = 0;
+                    searchMines(row, column);
+                    matrixBoxs[row][column].setMinesAround(minesAround);
+                    switch (minesAround) {
+                        case 1:
+                            matrixBoxs[row][column].setForeground(Color.red);
+                            break;
+                        case 2:
+                            matrixBoxs[row][column].setForeground(Color.blue);
+                            break;
+                        case 3:
+                            matrixBoxs[row][column].setForeground(Color.magenta);
+                            break;
+                        case 4:
+                            matrixBoxs[row][column].setForeground(Color.yellow);
+                            break;
+                        case 5:
+                            matrixBoxs[row][column].setForeground(Color.green);
+                            break;
+                        case 6:
+                            matrixBoxs[row][column].setForeground(Color.cyan);
+                            break;
+                        case 7:
+                            matrixBoxs[row][column].setForeground(Color.orange);
+                            break;
+                        case 8:
+                            matrixBoxs[row][column].setForeground(Color.black);
+                            break;
+                        case 9:
+                            matrixBoxs[row][column].setForeground(Color.darkGray);
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
         }
