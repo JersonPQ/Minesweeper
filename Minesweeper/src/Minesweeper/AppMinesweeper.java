@@ -243,7 +243,7 @@ public class AppMinesweeper extends javax.swing.JFrame {
 
                                     if (sumTotalValues == sumCurrentValues) {
                                         gameOver = true;
-                                        JOptionPane.showMessageDialog(null, "Congratulations! You have won the game!");
+                                        JOptionPane.showMessageDialog(null, "Congratulations! You have won!");
                                     }
                                 }
                             }
